@@ -3,7 +3,6 @@ import { PreloadedQuery, usePreloadedQuery } from "react-relay";
 import { Outlet } from "react-router";
 
 import { Loading } from "@phoenix/components";
-import { SpanFilterConditionProvider } from "@phoenix/pages/project/SpanFilterConditionContext";
 import { SpansTable } from "@phoenix/pages/project/SpansTable";
 import { TracePaginationProvider } from "@phoenix/pages/trace/TracePaginationContext";
 import { TracingRoot } from "@phoenix/pages/TracingRoot";
@@ -31,11 +30,9 @@ export const ProjectSpansPage = () => {
   return (
     <TracingRoot>
       <TracePaginationProvider>
-        <SpanFilterConditionProvider>
-          <Suspense fallback={<Loading />}>
-            <SpansTabContent queryReference={spansQueryReference} />
-          </Suspense>
-        </SpanFilterConditionProvider>
+        <Suspense fallback={<Loading />}>
+          <SpansTabContent queryReference={spansQueryReference} />
+        </Suspense>
         <Suspense>
           <Outlet />
         </Suspense>

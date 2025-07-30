@@ -3,7 +3,6 @@ import { PreloadedQuery, usePreloadedQuery } from "react-relay";
 import { Outlet } from "react-router";
 
 import { Loading } from "@phoenix/components/loading/Loading";
-import { SpanFilterConditionProvider } from "@phoenix/pages/project/SpanFilterConditionContext";
 import { TracesTable } from "@phoenix/pages/project/TracesTable";
 import { TracePaginationProvider } from "@phoenix/pages/trace/TracePaginationContext";
 import { TracingRoot } from "@phoenix/pages/TracingRoot";
@@ -37,11 +36,9 @@ export const ProjectTracesPage = () => {
   return (
     <TracingRoot>
       <TracePaginationProvider>
-        <SpanFilterConditionProvider>
-          <Suspense fallback={<Loading />}>
-            <TracesTabContent tracesQueryReference={tracesQueryReference} />
-          </Suspense>
-        </SpanFilterConditionProvider>
+        <Suspense fallback={<Loading />}>
+          <TracesTabContent tracesQueryReference={tracesQueryReference} />
+        </Suspense>
         <Suspense>
           <Outlet />
         </Suspense>

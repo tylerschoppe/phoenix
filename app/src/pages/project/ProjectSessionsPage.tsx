@@ -9,7 +9,6 @@ import {
 } from "@phoenix/pages/project/ProjectPageQueries";
 import { SessionSearchProvider } from "@phoenix/pages/project/SessionSearchContext";
 import { SessionsTable } from "@phoenix/pages/project/SessionsTable";
-import { SpanFilterConditionProvider } from "@phoenix/pages/project/SpanFilterConditionContext";
 import { TracingRoot } from "@phoenix/pages/TracingRoot";
 
 import { ProjectPageQueriesSessionsQuery as ProjectPageSessionsQueryType } from "./__generated__/ProjectPageQueriesSessionsQuery.graphql";
@@ -37,11 +36,9 @@ export const ProjectSessionsPage = () => {
   }
   return (
     <TracingRoot>
-      <SpanFilterConditionProvider>
-        <Suspense fallback={<Loading />}>
-          <SessionsTabContent queryReference={sessionsQueryReference} />
-        </Suspense>
-      </SpanFilterConditionProvider>
+      <Suspense fallback={<Loading />}>
+        <SessionsTabContent queryReference={sessionsQueryReference} />
+      </Suspense>
       <Suspense>
         <Outlet />
       </Suspense>
