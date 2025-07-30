@@ -100,10 +100,16 @@ export function ProjectPageHeader(props: {
 
   // Refetch the count of traces if the fetchKey or filters change
   useEffect(() => {
+    // Recalculate active filters inside useEffect to ensure fresh values
+    const currentActiveFilterCondition = tab === "spans" || tab === "traces" ? filterCondition : "";
+    const currentActiveSessionFilter = tab === "sessions" ? filterIoSubstringOrSessionId : "";
+    
     console.log('ProjectPageHeader refetch triggered:', {
       tab,
       filterCondition,
       filterIoSubstringOrSessionId,
+      currentActiveFilterCondition,
+      currentActiveSessionFilter,
       activeFilterCondition,
       activeSessionFilter,
       fetchKey,
@@ -111,13 +117,13 @@ export function ProjectPageHeader(props: {
     startTransition(() => {
       refetch(
         {
-          filterCondition: activeFilterCondition || null,
-          sessionFilter: activeSessionFilter || null,
+          filterCondition: currentActiveFilterCondition || null,
+          sessionFilter: currentActiveSessionFilter || null,
         },
         { fetchPolicy: "store-and-network" }
       );
     });
-  }, [fetchKey, refetch, activeFilterCondition, activeSessionFilter, tab, filterCondition, filterIoSubstringOrSessionId]);
+  }, [fetchKey, refetch, tab, filterCondition, filterIoSubstringOrSessionId]);
 
   const latencyMsP50 = data?.latencyMsP50;
   const latencyMsP99 = data?.latencyMsP99;
