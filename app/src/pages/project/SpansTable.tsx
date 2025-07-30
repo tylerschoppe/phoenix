@@ -63,6 +63,7 @@ import { ProjectFilterConfigButton } from "./ProjectFilterConfigButton";
 import { ProjectTableEmpty } from "./ProjectTableEmpty";
 import { RetrievalEvaluationLabel } from "./RetrievalEvaluationLabel";
 import { SpanColumnSelector } from "./SpanColumnSelector";
+import { useSpanFilterCondition } from "./SpanFilterConditionContext";
 import { SpanFilterConditionField } from "./SpanFilterConditionField";
 import { SpanSelectionToolbar } from "./SpanSelectionToolbar";
 import { spansTableCSS } from "./styles";
@@ -161,7 +162,7 @@ export function SpansTable(props: SpansTableProps) {
   const isFirstRender = useRef<boolean>(true);
   const [rowSelection, setRowSelection] = useState({});
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [filterCondition, setFilterCondition] = useState<string>("");
+  const { filterCondition } = useSpanFilterCondition();
   const [rootSpansOnly, setRootSpansOnly] = useState<boolean>(true);
   const columnVisibility = useTracingContext((state) => state.columnVisibility);
   const { data, loadNext, hasNext, isLoadingNext, refetch } =
@@ -643,7 +644,7 @@ export function SpansTable(props: SpansTableProps) {
         flex="none"
       >
         <Flex direction="row" gap="size-100" width="100%" alignItems="center">
-          <SpanFilterConditionField onValidCondition={setFilterCondition} />
+          <SpanFilterConditionField />
 
           <ToggleButtonGroup
             aria-label="Toggle between root and all spans"

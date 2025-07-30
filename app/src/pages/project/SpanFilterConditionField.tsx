@@ -254,7 +254,7 @@ type SpanFilterConditionFieldProps = {
   /**
    * Callback when the condition is valid
    */
-  onValidCondition: (condition: string) => void;
+  onValidCondition?: (condition: string) => void;
   placeholder?: string;
 };
 export function SpanFilterConditionField(props: SpanFilterConditionFieldProps) {
@@ -281,9 +281,11 @@ export function SpanFilterConditionField(props: SpanFilterConditionFieldProps) {
           setErrorMessage(result?.errorMessage ?? "Invalid filter condition");
         } else {
           setErrorMessage("");
-          startTransition(() => {
-            onValidCondition(deferredFilterCondition);
-          });
+          if (onValidCondition) {
+            startTransition(() => {
+              onValidCondition(deferredFilterCondition);
+            });
+          }
         }
       }
     );

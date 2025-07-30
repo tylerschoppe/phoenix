@@ -46,6 +46,7 @@ export function ProjectPageHeader(props: {
   const activeSessionFilter =
     tab === "sessions" ? filterIoSubstringOrSessionId : "";
 
+
   const [data, refetch] = useRefetchableFragment<
     ProjectPageHeaderQuery,
     ProjectPageHeader_stats$key

@@ -60,6 +60,7 @@ import { DEFAULT_PAGE_SIZE } from "./constants";
 import { ProjectTableEmpty } from "./ProjectTableEmpty";
 import { RetrievalEvaluationLabel } from "./RetrievalEvaluationLabel";
 import { SpanColumnSelector } from "./SpanColumnSelector";
+import { useSpanFilterCondition } from "./SpanFilterConditionContext";
 import { SpanFilterConditionField } from "./SpanFilterConditionField";
 import { SpanSelectionToolbar } from "./SpanSelectionToolbar";
 import { spansTableCSS } from "./styles";
@@ -189,7 +190,7 @@ export function TracesTable(props: TracesTableProps) {
   const isFirstRender = useRef<boolean>(true);
   const [rowSelection, setRowSelection] = useState({});
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [filterCondition, setFilterCondition] = useState<string>("");
+  const { filterCondition } = useSpanFilterCondition();
   const { fetchKey } = useStreamState();
   const { data, loadNext, hasNext, isLoadingNext, refetch } =
     usePaginationFragment<TracesTableQuery, TracesTable_spans$key>(
@@ -817,7 +818,7 @@ export function TracesTable(props: TracesTableProps) {
         flex="none"
       >
         <Flex direction="row" gap="size-100" width="100%" alignItems="center">
-          <SpanFilterConditionField onValidCondition={setFilterCondition} />
+          <SpanFilterConditionField />
           <SpanColumnSelector columns={computedColumns} query={data} />
         </Flex>
       </View>
