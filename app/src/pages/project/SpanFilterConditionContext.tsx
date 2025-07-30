@@ -29,10 +29,11 @@ export function useSpanFilterCondition() {
 
 export function SpanFilterConditionProvider(props: PropsWithChildren) {
   const [filterCondition, _setFilterCondition] = useState<string>("");
+  const contextId = Math.random().toString(36).substr(2, 9);
   
   useEffect(() => {
-    console.log('SpanFilterConditionContext filterCondition changed:', filterCondition);
-  }, [filterCondition]);
+    console.log(`SpanFilterConditionContext [${contextId}] filterCondition changed:`, filterCondition);
+  }, [filterCondition, contextId]);
   const setFilterCondition = useCallback((condition: string) => {
     startTransition(() => {
       _setFilterCondition(condition);

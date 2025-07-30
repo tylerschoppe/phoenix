@@ -40,6 +40,13 @@ export function ProjectPageHeader(props: {
   const { filterCondition } = useSpanFilterCondition();
   const { filterIoSubstringOrSessionId } = useSessionSearchContext();
 
+  console.log('ProjectPageHeader context values:', {
+    tab,
+    filterCondition,
+    filterIoSubstringOrSessionId,
+    timestamp: Date.now(),
+  });
+
   // Determine active filters by tab
   const activeFilterCondition =
     tab === "spans" || tab === "traces" ? filterCondition : "";
@@ -113,7 +120,10 @@ export function ProjectPageHeader(props: {
       activeFilterCondition,
       activeSessionFilter,
       fetchKey,
+      timestamp: Date.now(),
     });
+    
+    // Always refetch, even if values appear unchanged (to handle React batching issues)
     startTransition(() => {
       refetch(
         {
