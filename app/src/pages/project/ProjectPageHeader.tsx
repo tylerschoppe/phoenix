@@ -18,6 +18,9 @@ import { RichTokenBreakdown } from "@phoenix/components/RichTokenCostBreakdown";
 import { LatencyText } from "@phoenix/components/trace/LatencyText";
 import { useStreamState } from "@phoenix/contexts/StreamStateContext";
 import { costFormatter, intFormatter } from "@phoenix/utils/numberFormatUtils";
+import { useProjectRootPath } from "@phoenix/hooks/useProjectRootPath";
+import { useSpanFilterCondition } from "./SpanFilterConditionContext";
+import { useSessionSearchContext } from "./SessionSearchContext";
 
 import { ProjectPageHeader_stats$key } from "./__generated__/ProjectPageHeader_stats.graphql";
 import { ProjectPageHeaderQuery } from "./__generated__/ProjectPageHeaderQuery.graphql";
@@ -33,6 +36,14 @@ export function ProjectPageHeader(props: {
 }) {
   const { extra } = props;
   const { fetchKey } = useStreamState();
+  const { tab } = useProjectRootPath();
+  const { filterCondition } = useSpanFilterCondition();
+  const { filterIoSubstringOrSessionId } = useSessionSearchContext();
+
+  // Determine active filters by tab
+  const activeFilterCondition = (tab === "spans" || tab === "traces") ? filterCondition : "";
+  const activeSessionFilter = tab === "sessions" ? filterIoSubstringOrSessionId : "";
+
   const [data, refetch] = useRefetchableFragment<
     ProjectPageHeaderQuery,
     ProjectPageHeader_stats$key
@@ -40,8 +51,8 @@ export function ProjectPageHeader(props: {
     graphql`
       fragment ProjectPageHeader_stats on Project
       @refetchable(queryName: "ProjectPageHeaderQuery") {
-        traceCount(timeRange: $timeRange)
-        costSummary(timeRange: $timeRange) {
+        traceCount(timeRange: $timeRange, filterCondition: $filterCondition, sessionFilter: $sessionFilter)
+        costSummary(timeRange: $timeRange, filterCondition: $filterCondition, sessionFilter: $sessionFilter) {
           total {
             cost
           }
@@ -55,10 +66,14 @@ export function ProjectPageHeader(props: {
         latencyMsP50: latencyMsQuantile(
           probability: 0.50
           timeRange: $timeRange
+          filterCondition: $filterCondition
+          sessionFilter: $sessionFilter
         )
         latencyMsP99: latencyMsQuantile(
           probability: 0.99
           timeRange: $timeRange
+          filterCondition: $filterCondition
+          sessionFilter: $sessionFilter
         )
         spanAnnotationNames
         documentEvaluationNames
@@ -67,12 +82,15 @@ export function ProjectPageHeader(props: {
     props.project
   );
 
-  // Refetch the count of traces if the fetchKey changes
+  // Refetch the count of traces if the fetchKey or filters change
   useEffect(() => {
     startTransition(() => {
-      refetch({}, { fetchPolicy: "store-and-network" });
+      refetch({
+        filterCondition: activeFilterCondition || null,
+        sessionFilter: activeSessionFilter || null,
+      }, { fetchPolicy: "store-and-network" });
     });
-  }, [fetchKey, refetch]);
+  }, [fetchKey, refetch, activeFilterCondition, activeSessionFilter]);
 
   const latencyMsP50 = data?.latencyMsP50;
   const latencyMsP99 = data?.latencyMsP99;

@@ -31,6 +31,8 @@ import { ProjectPageQueriesSpansQuery as ProjectPageSpansQueryType } from "./__g
 import { ProjectPageQueriesTracesQuery as ProjectPageTracesQueryType } from "./__generated__/ProjectPageQueriesTracesQuery.graphql";
 import { ProjectPageQuery as ProjectPageQueryType } from "./__generated__/ProjectPageQuery.graphql";
 import { ProjectPageHeader } from "./ProjectPageHeader";
+import { SpanFilterConditionProvider } from "./SpanFilterConditionContext";
+import { SessionSearchProvider } from "./SessionSearchContext";
 import {
   ProjectPageQueriesProjectConfigQuery,
   ProjectPageQueriesSessionsQuery,
@@ -220,57 +222,61 @@ export function ProjectPageContent({
 
   return (
     <StreamStateProvider>
-      <main css={mainCSS}>
-        <ProjectPageHeader
-          project={data.project}
-          extra={
-            <Flex direction="row" alignItems="center" gap="size-100">
-              <StreamToggle project={data.project} />
-              <ConnectedTimeRangeSelector />
-            </Flex>
-          }
-        />
-        <ProjectPageQueryReferenceContext.Provider
-          value={{
-            spansQueryReference: spansQueryReference ?? null,
-            sessionsQueryReference: sessionsQueryReference ?? null,
-            tracesQueryReference: tracesQueryReference ?? null,
-            projectConfigQueryReference: projectConfigQueryReference ?? null,
-          }}
-        >
-          <Tabs
-            onSelectionChange={(key) => {
-              if (typeof key === "string" && isTab(key)) {
-                onTabChange(TAB_INDEX_MAP[key]);
+      <SpanFilterConditionProvider>
+        <SessionSearchProvider>
+          <main css={mainCSS}>
+            <ProjectPageHeader
+              project={data.project}
+              extra={
+                <Flex direction="row" alignItems="center" gap="size-100">
+                  <StreamToggle project={data.project} />
+                  <ConnectedTimeRangeSelector />
+                </Flex>
               }
-            }}
-            selectedKey={tab}
-          >
-            <TabList>
-              <Tab id="spans">Spans</Tab>
-              <Tab id="traces">Traces</Tab>
-              <Tab id="sessions">Sessions</Tab>
-              <Tab id="metrics">Metrics</Tab>
-              <Tab id="config">Config</Tab>
-            </TabList>
-            <LazyTabPanel padded={false} id="spans">
-              <Outlet />
-            </LazyTabPanel>
-            <LazyTabPanel padded={false} id="traces">
-              <Outlet />
-            </LazyTabPanel>
-            <LazyTabPanel padded={false} id="sessions">
-              <Outlet />
-            </LazyTabPanel>
-            <LazyTabPanel padded={false} id="metrics">
-              <Outlet />
-            </LazyTabPanel>
-            <LazyTabPanel padded={false} id="config">
-              <Outlet />
-            </LazyTabPanel>
-          </Tabs>
-        </ProjectPageQueryReferenceContext.Provider>
-      </main>
+            />
+            <ProjectPageQueryReferenceContext.Provider
+              value={{
+                spansQueryReference: spansQueryReference ?? null,
+                sessionsQueryReference: sessionsQueryReference ?? null,
+                tracesQueryReference: tracesQueryReference ?? null,
+                projectConfigQueryReference: projectConfigQueryReference ?? null,
+              }}
+            >
+              <Tabs
+                onSelectionChange={(key) => {
+                  if (typeof key === "string" && isTab(key)) {
+                    onTabChange(TAB_INDEX_MAP[key]);
+                  }
+                }}
+                selectedKey={tab}
+              >
+                <TabList>
+                  <Tab id="spans">Spans</Tab>
+                  <Tab id="traces">Traces</Tab>
+                  <Tab id="sessions">Sessions</Tab>
+                  <Tab id="metrics">Metrics</Tab>
+                  <Tab id="config">Config</Tab>
+                </TabList>
+                <LazyTabPanel padded={false} id="spans">
+                  <Outlet />
+                </LazyTabPanel>
+                <LazyTabPanel padded={false} id="traces">
+                  <Outlet />
+                </LazyTabPanel>
+                <LazyTabPanel padded={false} id="sessions">
+                  <Outlet />
+                </LazyTabPanel>
+                <LazyTabPanel padded={false} id="metrics">
+                  <Outlet />
+                </LazyTabPanel>
+                <LazyTabPanel padded={false} id="config">
+                  <Outlet />
+                </LazyTabPanel>
+              </Tabs>
+            </ProjectPageQueryReferenceContext.Provider>
+          </main>
+        </SessionSearchProvider>
+      </SpanFilterConditionProvider>
     </StreamStateProvider>
   );
 }
