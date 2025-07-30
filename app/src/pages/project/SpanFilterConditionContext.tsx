@@ -4,6 +4,7 @@ import {
   startTransition,
   useCallback,
   useContext,
+  useEffect,
   useState,
 } from "react";
 
@@ -28,6 +29,10 @@ export function useSpanFilterCondition() {
 
 export function SpanFilterConditionProvider(props: PropsWithChildren) {
   const [filterCondition, _setFilterCondition] = useState<string>("");
+  
+  useEffect(() => {
+    console.log('SpanFilterConditionContext filterCondition changed:', filterCondition);
+  }, [filterCondition]);
   const setFilterCondition = useCallback((condition: string) => {
     startTransition(() => {
       _setFilterCondition(condition);
