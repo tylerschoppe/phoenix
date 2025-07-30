@@ -100,6 +100,14 @@ export function ProjectPageHeader(props: {
 
   // Refetch the count of traces if the fetchKey or filters change
   useEffect(() => {
+    console.log('ProjectPageHeader refetch triggered:', {
+      tab,
+      filterCondition,
+      filterIoSubstringOrSessionId,
+      activeFilterCondition,
+      activeSessionFilter,
+      fetchKey,
+    });
     startTransition(() => {
       refetch(
         {
@@ -109,7 +117,7 @@ export function ProjectPageHeader(props: {
         { fetchPolicy: "store-and-network" }
       );
     });
-  }, [fetchKey, refetch, activeFilterCondition, activeSessionFilter]);
+  }, [fetchKey, refetch, activeFilterCondition, activeSessionFilter, tab, filterCondition, filterIoSubstringOrSessionId]);
 
   const latencyMsP50 = data?.latencyMsP50;
   const latencyMsP99 = data?.latencyMsP99;
@@ -117,6 +125,15 @@ export function ProjectPageHeader(props: {
     (name) => name !== "note"
   );
   const documentEvaluationNames = data?.documentEvaluationNames;
+
+  console.log('ProjectPageHeader data:', {
+    traceCount: data?.traceCount,
+    totalCost: data?.costSummary?.total?.cost,
+    latencyMsP50,
+    latencyMsP99,
+    activeFilterCondition,
+    activeSessionFilter,
+  });
 
   const colors = useCategoryChartColors();
   return (
