@@ -31,8 +31,6 @@ import { ProjectPageQueriesSpansQuery as ProjectPageSpansQueryType } from "./__g
 import { ProjectPageQueriesTracesQuery as ProjectPageTracesQueryType } from "./__generated__/ProjectPageQueriesTracesQuery.graphql";
 import { ProjectPageQuery as ProjectPageQueryType } from "./__generated__/ProjectPageQuery.graphql";
 import { ProjectPageHeader } from "./ProjectPageHeader";
-import { SpanFilterConditionProvider } from "./SpanFilterConditionContext";
-import { SessionSearchProvider } from "./SessionSearchContext";
 import {
   ProjectPageQueriesProjectConfigQuery,
   ProjectPageQueriesSessionsQuery,
@@ -40,6 +38,8 @@ import {
   ProjectPageQueriesTracesQuery,
   ProjectPageQueryReferenceContext,
 } from "./ProjectPageQueries";
+import { SessionSearchProvider } from "./SessionSearchContext";
+import { SpanFilterConditionProvider } from "./SpanFilterConditionContext";
 import { StreamToggle } from "./StreamToggle";
 
 const mainCSS = css`
@@ -122,7 +122,7 @@ export function ProjectPageContent({
     graphql`
       query ProjectPageQuery($id: ID!, $timeRange: TimeRange!) {
         project: node(id: $id) {
-          ...ProjectPageHeader_stats
+          ...ProjectPageHeader_stats @arguments(timeRange: $timeRange)
           ...StreamToggle_data
         }
       }
@@ -239,7 +239,8 @@ export function ProjectPageContent({
                 spansQueryReference: spansQueryReference ?? null,
                 sessionsQueryReference: sessionsQueryReference ?? null,
                 tracesQueryReference: tracesQueryReference ?? null,
-                projectConfigQueryReference: projectConfigQueryReference ?? null,
+                projectConfigQueryReference:
+                  projectConfigQueryReference ?? null,
               }}
             >
               <Tabs

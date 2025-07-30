@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<7dd19967d7ee88af8a49632f8e7cda60>>
+ * @generated SignedSource<<5073c44f135ab6773ab68aa3e6d48a74>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -81,7 +81,7 @@ return {
         "plural": false,
         "selections": [
           {
-            "args": null,
+            "args": (v3/*: any*/),
             "kind": "FragmentSpread",
             "name": "ProjectPageHeader_stats"
           },
@@ -235,16 +235,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "bf0392b6f20783d10af768eb720d4918",
+    "cacheID": "f77442b1a7609fdc45ab4c6f86ec934d",
     "id": null,
     "metadata": {},
     "name": "ProjectPageQuery",
     "operationKind": "query",
-    "text": "query ProjectPageQuery(\n  $id: ID!\n  $timeRange: TimeRange!\n) {\n  project: node(id: $id) {\n    __typename\n    ...ProjectPageHeader_stats\n    ...StreamToggle_data\n    id\n  }\n}\n\nfragment ProjectPageHeader_stats on Project {\n  traceCount(timeRange: $timeRange)\n  costSummary(timeRange: $timeRange) {\n    total {\n      cost\n    }\n    prompt {\n      cost\n    }\n    completion {\n      cost\n    }\n  }\n  latencyMsP50: latencyMsQuantile(probability: 0.5, timeRange: $timeRange)\n  latencyMsP99: latencyMsQuantile(probability: 0.99, timeRange: $timeRange)\n  spanAnnotationNames\n  documentEvaluationNames\n  id\n}\n\nfragment StreamToggle_data on Project {\n  streamingLastUpdatedAt\n  id\n}\n"
+    "text": "query ProjectPageQuery(\n  $id: ID!\n  $timeRange: TimeRange!\n) {\n  project: node(id: $id) {\n    __typename\n    ...ProjectPageHeader_stats_3E0ZE6\n    ...StreamToggle_data\n    id\n  }\n}\n\nfragment ProjectPageHeader_stats_3E0ZE6 on Project {\n  traceCount(timeRange: $timeRange)\n  costSummary(timeRange: $timeRange) {\n    total {\n      cost\n    }\n    prompt {\n      cost\n    }\n    completion {\n      cost\n    }\n  }\n  latencyMsP50: latencyMsQuantile(probability: 0.5, timeRange: $timeRange)\n  latencyMsP99: latencyMsQuantile(probability: 0.99, timeRange: $timeRange)\n  spanAnnotationNames\n  documentEvaluationNames\n  id\n}\n\nfragment StreamToggle_data on Project {\n  streamingLastUpdatedAt\n  id\n}\n"
   }
 };
 })();
 
-(node as any).hash = "f940b0d4a1ccd3cfc8bb67f22cd7ccc2";
+(node as any).hash = "0f5a47ff4eb9f29b9a97638147f21567";
 
 export default node;

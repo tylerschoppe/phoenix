@@ -17,15 +17,15 @@ import { useCategoryChartColors } from "@phoenix/components/chart/colors";
 import { RichTokenBreakdown } from "@phoenix/components/RichTokenCostBreakdown";
 import { LatencyText } from "@phoenix/components/trace/LatencyText";
 import { useStreamState } from "@phoenix/contexts/StreamStateContext";
-import { costFormatter, intFormatter } from "@phoenix/utils/numberFormatUtils";
 import { useProjectRootPath } from "@phoenix/hooks/useProjectRootPath";
-import { useSpanFilterCondition } from "./SpanFilterConditionContext";
-import { useSessionSearchContext } from "./SessionSearchContext";
+import { costFormatter, intFormatter } from "@phoenix/utils/numberFormatUtils";
 
 import { ProjectPageHeader_stats$key } from "./__generated__/ProjectPageHeader_stats.graphql";
 import { ProjectPageHeaderQuery } from "./__generated__/ProjectPageHeaderQuery.graphql";
 import { AnnotationSummary } from "./AnnotationSummary";
 import { DocumentEvaluationSummary } from "./DocumentEvaluationSummary";
+import { useSessionSearchContext } from "./SessionSearchContext";
+import { useSpanFilterCondition } from "./SpanFilterConditionContext";
 
 export function ProjectPageHeader(props: {
   project: ProjectPageHeader_stats$key;
@@ -41,8 +41,10 @@ export function ProjectPageHeader(props: {
   const { filterIoSubstringOrSessionId } = useSessionSearchContext();
 
   // Determine active filters by tab
-  const activeFilterCondition = (tab === "spans" || tab === "traces") ? filterCondition : "";
-  const activeSessionFilter = tab === "sessions" ? filterIoSubstringOrSessionId : "";
+  const activeFilterCondition =
+    tab === "spans" || tab === "traces" ? filterCondition : "";
+  const activeSessionFilter =
+    tab === "sessions" ? filterIoSubstringOrSessionId : "";
 
   const [data, refetch] = useRefetchableFragment<
     ProjectPageHeaderQuery,
@@ -50,9 +52,22 @@ export function ProjectPageHeader(props: {
   >(
     graphql`
       fragment ProjectPageHeader_stats on Project
-      @refetchable(queryName: "ProjectPageHeaderQuery") {
-        traceCount(timeRange: $timeRange, filterCondition: $filterCondition, sessionFilter: $sessionFilter)
-        costSummary(timeRange: $timeRange, filterCondition: $filterCondition, sessionFilter: $sessionFilter) {
+      @refetchable(queryName: "ProjectPageHeaderQuery")
+      @argumentDefinitions(
+        timeRange: { type: "TimeRange!" }
+        filterCondition: { type: "String", defaultValue: null }
+        sessionFilter: { type: "String", defaultValue: null }
+      ) {
+        traceCount(
+          timeRange: $timeRange
+          filterCondition: $filterCondition
+          sessionFilter: $sessionFilter
+        )
+        costSummary(
+          timeRange: $timeRange
+          filterCondition: $filterCondition
+          sessionFilter: $sessionFilter
+        ) {
           total {
             cost
           }
@@ -85,10 +100,13 @@ export function ProjectPageHeader(props: {
   // Refetch the count of traces if the fetchKey or filters change
   useEffect(() => {
     startTransition(() => {
-      refetch({
-        filterCondition: activeFilterCondition || null,
-        sessionFilter: activeSessionFilter || null,
-      }, { fetchPolicy: "store-and-network" });
+      refetch(
+        {
+          filterCondition: activeFilterCondition || null,
+          sessionFilter: activeSessionFilter || null,
+        },
+        { fetchPolicy: "store-and-network" }
+      );
     });
   }, [fetchKey, refetch, activeFilterCondition, activeSessionFilter]);
 

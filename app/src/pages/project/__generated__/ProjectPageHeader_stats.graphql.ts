@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<71c8c47e839e813cf689141149463973>>
+ * @generated SignedSource<<17fead8e76a7358c7bf1984e2725ecaf>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -40,13 +40,25 @@ import ProjectPageHeaderQuery_graphql from './ProjectPageHeaderQuery.graphql';
 const node: ReaderFragment = (function(){
 var v0 = {
   "kind": "Variable",
+  "name": "filterCondition",
+  "variableName": "filterCondition"
+},
+v1 = {
+  "kind": "Variable",
+  "name": "sessionFilter",
+  "variableName": "sessionFilter"
+},
+v2 = {
+  "kind": "Variable",
   "name": "timeRange",
   "variableName": "timeRange"
 },
-v1 = [
-  (v0/*: any*/)
+v3 = [
+  (v0/*: any*/),
+  (v1/*: any*/),
+  (v2/*: any*/)
 ],
-v2 = [
+v4 = [
   {
     "alias": null,
     "args": null,
@@ -58,7 +70,18 @@ v2 = [
 return {
   "argumentDefinitions": [
     {
-      "kind": "RootArgument",
+      "defaultValue": null,
+      "kind": "LocalArgument",
+      "name": "filterCondition"
+    },
+    {
+      "defaultValue": null,
+      "kind": "LocalArgument",
+      "name": "sessionFilter"
+    },
+    {
+      "defaultValue": null,
+      "kind": "LocalArgument",
       "name": "timeRange"
     }
   ],
@@ -80,14 +103,14 @@ return {
   "selections": [
     {
       "alias": null,
-      "args": (v1/*: any*/),
+      "args": (v3/*: any*/),
       "kind": "ScalarField",
       "name": "traceCount",
       "storageKey": null
     },
     {
       "alias": null,
-      "args": (v1/*: any*/),
+      "args": (v3/*: any*/),
       "concreteType": "SpanCostSummary",
       "kind": "LinkedField",
       "name": "costSummary",
@@ -100,7 +123,7 @@ return {
           "kind": "LinkedField",
           "name": "total",
           "plural": false,
-          "selections": (v2/*: any*/),
+          "selections": (v4/*: any*/),
           "storageKey": null
         },
         {
@@ -110,7 +133,7 @@ return {
           "kind": "LinkedField",
           "name": "prompt",
           "plural": false,
-          "selections": (v2/*: any*/),
+          "selections": (v4/*: any*/),
           "storageKey": null
         },
         {
@@ -120,7 +143,7 @@ return {
           "kind": "LinkedField",
           "name": "completion",
           "plural": false,
-          "selections": (v2/*: any*/),
+          "selections": (v4/*: any*/),
           "storageKey": null
         }
       ],
@@ -129,12 +152,14 @@ return {
     {
       "alias": "latencyMsP50",
       "args": [
+        (v0/*: any*/),
         {
           "kind": "Literal",
           "name": "probability",
           "value": 0.5
         },
-        (v0/*: any*/)
+        (v1/*: any*/),
+        (v2/*: any*/)
       ],
       "kind": "ScalarField",
       "name": "latencyMsQuantile",
@@ -143,12 +168,14 @@ return {
     {
       "alias": "latencyMsP99",
       "args": [
+        (v0/*: any*/),
         {
           "kind": "Literal",
           "name": "probability",
           "value": 0.99
         },
-        (v0/*: any*/)
+        (v1/*: any*/),
+        (v2/*: any*/)
       ],
       "kind": "ScalarField",
       "name": "latencyMsQuantile",
@@ -181,6 +208,6 @@ return {
 };
 })();
 
-(node as any).hash = "a82020736a81365c539d7d9a31318fa1";
+(node as any).hash = "0bf56ee26664dc51f5832d444d84e77e";
 
 export default node;
