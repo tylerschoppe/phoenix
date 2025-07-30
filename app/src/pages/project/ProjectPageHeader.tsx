@@ -40,12 +40,6 @@ export function ProjectPageHeader(props: {
   const { filterCondition } = useSpanFilterCondition();
   const { filterIoSubstringOrSessionId } = useSessionSearchContext();
 
-  console.log('ProjectPageHeader context values:', {
-    tab,
-    filterCondition,
-    filterIoSubstringOrSessionId,
-    timestamp: Date.now(),
-  });
 
   // Determine active filters by tab
   const activeFilterCondition =
@@ -111,19 +105,6 @@ export function ProjectPageHeader(props: {
     const currentActiveFilterCondition = tab === "spans" || tab === "traces" ? filterCondition : "";
     const currentActiveSessionFilter = tab === "sessions" ? filterIoSubstringOrSessionId : "";
     
-    console.log('ProjectPageHeader refetch triggered:', {
-      tab,
-      filterCondition,
-      filterIoSubstringOrSessionId,
-      currentActiveFilterCondition,
-      currentActiveSessionFilter,
-      activeFilterCondition,
-      activeSessionFilter,
-      fetchKey,
-      timestamp: Date.now(),
-    });
-    
-    // Always refetch, even if values appear unchanged (to handle React batching issues)
     startTransition(() => {
       refetch(
         {
@@ -142,14 +123,6 @@ export function ProjectPageHeader(props: {
   );
   const documentEvaluationNames = data?.documentEvaluationNames;
 
-  console.log('ProjectPageHeader data:', {
-    traceCount: data?.traceCount,
-    totalCost: data?.costSummary?.total?.cost,
-    latencyMsP50,
-    latencyMsP99,
-    activeFilterCondition,
-    activeSessionFilter,
-  });
 
   const colors = useCategoryChartColors();
   return (

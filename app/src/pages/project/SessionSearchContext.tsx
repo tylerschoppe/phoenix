@@ -4,7 +4,6 @@ import {
   startTransition,
   useCallback,
   useContext,
-  useEffect,
   useState,
 } from "react";
 
@@ -28,10 +27,6 @@ export function useSessionSearchContext() {
 
 export function SessionSearchProvider(props: PropsWithChildren) {
   const [substring, _setSubstring] = useState<string>("");
-  
-  useEffect(() => {
-    console.log('SessionSearchContext filterIoSubstringOrSessionId changed:', substring);
-  }, [substring]);
   
   const setSubstring = useCallback((condition: string) => {
     startTransition(() => {
