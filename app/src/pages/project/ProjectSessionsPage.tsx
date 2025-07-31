@@ -7,7 +7,6 @@ import {
   ProjectPageQueriesSessionsQuery,
   useProjectPageQueryReferenceContext,
 } from "@phoenix/pages/project/ProjectPageQueries";
-import { SessionSearchProvider } from "@phoenix/pages/project/SessionSearchContext";
 import { SessionsTable } from "@phoenix/pages/project/SessionsTable";
 import { TracingRoot } from "@phoenix/pages/TracingRoot";
 
@@ -22,11 +21,7 @@ function SessionsTabContent({
     ProjectPageQueriesSessionsQuery,
     queryReference
   );
-  return (
-    <SessionSearchProvider>
-      <SessionsTable project={data.project} />
-    </SessionSearchProvider>
-  );
+  return <SessionsTable project={data.project} />;
 }
 
 export const ProjectSessionsPage = () => {
