@@ -35,6 +35,10 @@ describe('validateSpanFilter', () => {
       'not',
       'in',
       'not in',
+      'metadata["c"]', // Bare field access without operator
+      'attributes["key"]', // Bare field access without operator  
+      'annotations["test"]', // Bare annotation access without operator
+      'evals["score"]', // Bare eval access without operator
     ];
 
     incompleteFilters.forEach(filter => {
@@ -51,6 +55,10 @@ describe('validateSpanFilter', () => {
       'attributes[] == "value"', // Empty brackets
       'metadata[] == "value"', // Empty brackets
       'annotations[] == "value"', // Empty brackets
+      'metadata[""] == "value"', // Empty string in brackets
+      'attributes[\'\'] == "value"', // Empty string in brackets
+      'annotations[""] == "value"', // Empty string in annotation brackets
+      'evals[\'\'] == "value"', // Empty string in annotation brackets
       'span_kind == "LLM\'', // Mismatched quotes
       'span_kind == \'LLM"', // Mixed quotes
       '(span_kind == "LLM"', // Unbalanced parentheses

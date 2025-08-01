@@ -230,8 +230,6 @@ function checkBasicStructure(filter: string): FilterValidationResult {
     new RegExp(`\\b${op}\\b`, 'i').test(filter)
   );
   const hasMembershipOperator = /\bin\b/i.test(filter);
-  const hasAttributeAccess = /attributes\s*\[|metadata\s*\[/.test(filter);
-  const hasAnnotationAccess = /(annotations|evals)\s*\[/.test(filter);
   
   // Special case: single words that might be field names are probably incomplete
   if (/^\w+$/.test(filter.trim())) {
@@ -240,12 +238,19 @@ function checkBasicStructure(filter: string): FilterValidationResult {
       errorMessage: 'Incomplete expression - missing comparison' 
     };
   }
-  
-  if (!hasComparisonOperator && !hasLogicalOperator && !hasMembershipOperator && 
-      !hasAttributeAccess && !hasAnnotationAccess) {
+
+  // Check for bare field access without operators (e.g., metadata['key'] without ==)
+  if (/^(attributes|metadata|annotations|evals)\s*\[.*\]\s*$/.test(filter.trim())) {
     return { 
       isValid: false, 
-      errorMessage: 'Missing operators or field access' 
+      errorMessage: 'Incomplete field access - missing comparison or operator' 
+    };
+  }
+  
+  if (!hasComparisonOperator && !hasLogicalOperator && !hasMembershipOperator) {
+    return { 
+      isValid: false, 
+      errorMessage: 'Missing operators - expressions need ==, !=, >, <, and, or, in, etc.' 
     };
   }
 
@@ -272,11 +277,27 @@ function checkCommonSyntaxErrors(filter: string): FilterValidationResult {
     };
   }
 
+  // Check for empty strings in brackets
+  if (/(attributes|metadata)\s*\[\s*['"]\s*['"]\s*\]/.test(filter)) {
+    return { 
+      isValid: false, 
+      errorMessage: 'Empty string in field access brackets' 
+    };
+  }
+
   // Check for malformed annotation access
   if (/(annotations|evals)\s*\[\s*\]/.test(filter)) {
     return { 
       isValid: false, 
       errorMessage: 'Empty brackets in annotation access' 
+    };
+  }
+
+  // Check for empty strings in annotation brackets
+  if (/(annotations|evals)\s*\[\s*['"]\s*['"]\s*\]/.test(filter)) {
+    return { 
+      isValid: false, 
+      errorMessage: 'Empty string in annotation access brackets' 
     };
   }
 
