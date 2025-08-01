@@ -43,9 +43,9 @@ export function ProjectPageHeader(props: {
 
   // Determine active filters by tab
   const activeFilterCondition =
-    tab === "spans" || tab === "traces" ? filterCondition : "";
+    tab === "spans" || tab === "traces" ? filterCondition : null;
   const activeSessionFilter =
-    tab === "sessions" ? filterIoSubstringOrSessionId : "";
+    tab === "sessions" ? filterIoSubstringOrSessionId : null;
 
 
   const [data, refetch] = useRefetchableFragment<
@@ -102,14 +102,14 @@ export function ProjectPageHeader(props: {
   // Refetch the count of traces if the fetchKey or filters change
   useEffect(() => {
     // Recalculate active filters inside useEffect to ensure fresh values
-    const currentActiveFilterCondition = tab === "spans" || tab === "traces" ? filterCondition : "";
-    const currentActiveSessionFilter = tab === "sessions" ? filterIoSubstringOrSessionId : "";
+    const currentActiveFilterCondition = tab === "spans" || tab === "traces" ? filterCondition : null;
+    const currentActiveSessionFilter = tab === "sessions" ? filterIoSubstringOrSessionId : null;
     
     startTransition(() => {
       refetch(
         {
-          filterCondition: currentActiveFilterCondition || null,
-          sessionFilter: currentActiveSessionFilter || null,
+          filterCondition: currentActiveFilterCondition,
+          sessionFilter: currentActiveSessionFilter,
         },
         { fetchPolicy: "store-and-network" }
       );

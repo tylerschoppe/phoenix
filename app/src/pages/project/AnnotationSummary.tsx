@@ -44,8 +44,8 @@ export function AnnotationSummary({ annotationName }: AnnotationSummaryProps) {
   const { filterIoSubstringOrSessionId } = useSessionSearchContext();
 
   // Determine active filters by tab (same logic as header)
-  const activeFilterCondition = (tab === "spans" || tab === "traces") ? filterCondition : "";
-  const activeSessionFilter = tab === "sessions" ? filterIoSubstringOrSessionId : "";
+  const activeFilterCondition = (tab === "spans" || tab === "traces") ? filterCondition : null;
+  const activeSessionFilter = tab === "sessions" ? filterIoSubstringOrSessionId : null;
   const data = useLazyLoadQuery<AnnotationSummaryQuery>(
     graphql`
       query AnnotationSummaryQuery(
@@ -53,10 +53,11 @@ export function AnnotationSummary({ annotationName }: AnnotationSummaryProps) {
         $annotationName: String!
         $timeRange: TimeRange!
         $filterCondition: String
+        $sessionFilter: String
       ) {
         project: node(id: $id) {
           ...AnnotationSummaryValueFragment
-            @arguments(annotationName: $annotationName, timeRange: $timeRange, filterCondition: $filterCondition)
+            @arguments(annotationName: $annotationName, timeRange: $timeRange, filterCondition: $filterCondition, sessionFilter: $sessionFilter)
         }
       }
     `,
@@ -67,7 +68,8 @@ export function AnnotationSummary({ annotationName }: AnnotationSummaryProps) {
         start: timeRange?.start?.toISOString(),
         end: timeRange?.end?.toISOString(),
       },
-      filterCondition: activeFilterCondition || null,
+      filterCondition: activeFilterCondition,
+      sessionFilter: activeSessionFilter,
     }
   );
   return (
@@ -91,8 +93,8 @@ function AnnotationSummaryValue(props: {
   const { filterIoSubstringOrSessionId } = useSessionSearchContext();
 
   // Determine active filters by tab (same logic as header)
-  const activeFilterCondition = (tab === "spans" || tab === "traces") ? filterCondition : "";
-  const activeSessionFilter = tab === "sessions" ? filterIoSubstringOrSessionId : "";
+  const activeFilterCondition = (tab === "spans" || tab === "traces") ? filterCondition : null;
+  const activeSessionFilter = tab === "sessions" ? filterIoSubstringOrSessionId : null;
   const [data, refetch] = useRefetchableFragment<
     AnnotationSummaryQuery,
     AnnotationSummaryValueFragment$key
@@ -104,6 +106,7 @@ function AnnotationSummaryValue(props: {
         annotationName: { type: "String!" }
         timeRange: { type: "TimeRange!" }
         filterCondition: { type: "String", defaultValue: null }
+        sessionFilter: { type: "String", defaultValue: null }
       ) {
         annotationConfigs {
           edges {
@@ -128,6 +131,7 @@ function AnnotationSummaryValue(props: {
           annotationName: $annotationName
           timeRange: $timeRange
           filterCondition: $filterCondition
+          sessionFilter: $sessionFilter
         ) {
           name
           labelFractions {
@@ -145,10 +149,11 @@ function AnnotationSummaryValue(props: {
   useEffect(() => {
     startTransition(() => {
       refetch({
-        filterCondition: activeFilterCondition || null,
+        filterCondition: activeFilterCondition,
+        sessionFilter: activeSessionFilter,
       }, { fetchPolicy: "store-and-network" });
     });
-  }, [fetchKey, refetch, activeFilterCondition]);
+  }, [fetchKey, refetch, activeFilterCondition, activeSessionFilter]);
 
   return (
     <SummaryValue

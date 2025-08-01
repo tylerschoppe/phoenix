@@ -1715,7 +1715,7 @@ type Project implements Node {
   """Names of available document evaluations."""
   documentEvaluationNames(spanId: ID): [String!]!
   traceAnnotationSummary(annotationName: String!, timeRange: TimeRange): AnnotationSummary
-  spanAnnotationSummary(annotationName: String!, timeRange: TimeRange, filterCondition: String): AnnotationSummary
+  spanAnnotationSummary(annotationName: String!, timeRange: TimeRange, filterCondition: String, sessionFilter: String): AnnotationSummary
   documentEvaluationSummary(evaluationName: String!, timeRange: TimeRange, filterCondition: String): DocumentEvaluationSummary
   streamingLastUpdatedAt: DateTime
   validateSpanFilterCondition(condition: String!): ValidationResult!
