@@ -30,6 +30,7 @@ import { formatPercent } from "@phoenix/utils/numberFormatUtils";
 
 import { AnnotationSummaryQuery } from "./__generated__/AnnotationSummaryQuery.graphql";
 import { AnnotationSummaryValueFragment$key } from "./__generated__/AnnotationSummaryValueFragment.graphql";
+import { useSessionSearchContext } from "./SessionSearchContext";
 import { useSpanFilterCondition } from "./SpanFilterConditionContext";
 
 type AnnotationSummaryProps = {
@@ -40,9 +41,11 @@ export function AnnotationSummary({ annotationName }: AnnotationSummaryProps) {
   const { timeRange } = useTimeRange();
   const { tab } = useProjectRootPath();
   const { filterCondition } = useSpanFilterCondition();
+  const { filterIoSubstringOrSessionId } = useSessionSearchContext();
 
   // Determine active filters by tab (same logic as header)
   const activeFilterCondition = (tab === "spans" || tab === "traces") ? filterCondition : "";
+  const activeSessionFilter = tab === "sessions" ? filterIoSubstringOrSessionId : "";
   const data = useLazyLoadQuery<AnnotationSummaryQuery>(
     graphql`
       query AnnotationSummaryQuery(
@@ -85,9 +88,11 @@ function AnnotationSummaryValue(props: {
   const { fetchKey } = useStreamState();
   const { tab } = useProjectRootPath();
   const { filterCondition } = useSpanFilterCondition();
+  const { filterIoSubstringOrSessionId } = useSessionSearchContext();
 
   // Determine active filters by tab (same logic as header)
   const activeFilterCondition = (tab === "spans" || tab === "traces") ? filterCondition : "";
+  const activeSessionFilter = tab === "sessions" ? filterIoSubstringOrSessionId : "";
   const [data, refetch] = useRefetchableFragment<
     AnnotationSummaryQuery,
     AnnotationSummaryValueFragment$key
