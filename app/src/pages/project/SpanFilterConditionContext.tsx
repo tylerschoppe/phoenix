@@ -7,7 +7,8 @@ import {
   useEffect,
   useState,
 } from "react";
-import { validateSpanFilter, isFilterExecutable } from "./spanFilterValidation";
+
+import { isFilterExecutable,validateSpanFilter } from "./spanFilterValidation";
 
 export type SpanFilterConditionContextType = {
   // Input value - what the user is currently typing

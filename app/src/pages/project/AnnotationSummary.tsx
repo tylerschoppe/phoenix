@@ -23,12 +23,14 @@ import { useTimeRange } from "@phoenix/components/datetime";
 import { ComponentSize, SizingProps } from "@phoenix/components/types";
 import { Truncate } from "@phoenix/components/utility/Truncate";
 import { useStreamState } from "@phoenix/contexts/StreamStateContext";
+import { useProjectRootPath } from "@phoenix/hooks/useProjectRootPath";
 import { useWordColor } from "@phoenix/hooks/useWordColor";
 import { Mutable } from "@phoenix/typeUtils";
 import { formatPercent } from "@phoenix/utils/numberFormatUtils";
 
 import { AnnotationSummaryQuery } from "./__generated__/AnnotationSummaryQuery.graphql";
 import { AnnotationSummaryValueFragment$key } from "./__generated__/AnnotationSummaryValueFragment.graphql";
+import { useSpanFilterCondition } from "./SpanFilterConditionContext";
 
 type AnnotationSummaryProps = {
   annotationName: string;
@@ -36,16 +38,22 @@ type AnnotationSummaryProps = {
 export function AnnotationSummary({ annotationName }: AnnotationSummaryProps) {
   const { projectId } = useParams();
   const { timeRange } = useTimeRange();
+  const { tab } = useProjectRootPath();
+  const { filterCondition } = useSpanFilterCondition();
+
+  // Determine active filters by tab (same logic as header)
+  const activeFilterCondition = (tab === "spans" || tab === "traces") ? filterCondition : "";
   const data = useLazyLoadQuery<AnnotationSummaryQuery>(
     graphql`
       query AnnotationSummaryQuery(
         $id: ID!
         $annotationName: String!
         $timeRange: TimeRange!
+        $filterCondition: String
       ) {
         project: node(id: $id) {
           ...AnnotationSummaryValueFragment
-            @arguments(annotationName: $annotationName, timeRange: $timeRange)
+            @arguments(annotationName: $annotationName, timeRange: $timeRange, filterCondition: $filterCondition)
         }
       }
     `,
@@ -56,6 +64,7 @@ export function AnnotationSummary({ annotationName }: AnnotationSummaryProps) {
         start: timeRange?.start?.toISOString(),
         end: timeRange?.end?.toISOString(),
       },
+      filterCondition: activeFilterCondition || null,
     }
   );
   return (
@@ -74,6 +83,11 @@ function AnnotationSummaryValue(props: {
 }) {
   const { project, annotationName } = props;
   const { fetchKey } = useStreamState();
+  const { tab } = useProjectRootPath();
+  const { filterCondition } = useSpanFilterCondition();
+
+  // Determine active filters by tab (same logic as header)
+  const activeFilterCondition = (tab === "spans" || tab === "traces") ? filterCondition : "";
   const [data, refetch] = useRefetchableFragment<
     AnnotationSummaryQuery,
     AnnotationSummaryValueFragment$key
@@ -84,6 +98,7 @@ function AnnotationSummaryValue(props: {
       @argumentDefinitions(
         annotationName: { type: "String!" }
         timeRange: { type: "TimeRange!" }
+        filterCondition: { type: "String", defaultValue: null }
       ) {
         annotationConfigs {
           edges {
@@ -107,6 +122,7 @@ function AnnotationSummaryValue(props: {
         spanAnnotationSummary(
           annotationName: $annotationName
           timeRange: $timeRange
+          filterCondition: $filterCondition
         ) {
           name
           labelFractions {
@@ -120,12 +136,14 @@ function AnnotationSummaryValue(props: {
     project
   );
 
-  // Refetch the annotation summary if the fetchKey changes
+  // Refetch the annotation summary if the fetchKey or filters change
   useEffect(() => {
     startTransition(() => {
-      refetch({}, { fetchPolicy: "store-and-network" });
+      refetch({
+        filterCondition: activeFilterCondition || null,
+      }, { fetchPolicy: "store-and-network" });
     });
-  }, [fetchKey, refetch]);
+  }, [fetchKey, refetch, activeFilterCondition]);
 
   return (
     <SummaryValue
