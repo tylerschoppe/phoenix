@@ -1,11 +1,9 @@
 import {
   startTransition,
-  useDeferredValue,
   useEffect,
   useRef,
   useState,
 } from "react";
-import { useParams } from "react-router";
 import {
   autocompletion,
   CompletionContext,
@@ -14,7 +12,6 @@ import {
 import { python } from "@codemirror/lang-python";
 import { githubDark, githubLight } from "@uiw/codemirror-theme-github";
 import CodeMirror, { EditorView, keymap } from "@uiw/react-codemirror";
-import { fetchQuery, graphql } from "relay-runtime";
 import { css } from "@emotion/react";
 
 import { AddonBefore, Field } from "@arizeai/components";
@@ -33,9 +30,7 @@ import {
   View,
 } from "@phoenix/components";
 import { useTheme } from "@phoenix/contexts";
-import environment from "@phoenix/RelayEnvironment";
 
-import { SpanFilterConditionFieldValidationQuery } from "./__generated__/SpanFilterConditionFieldValidationQuery.graphql";
 import { useSpanFilterCondition } from "./SpanFilterConditionContext";
 
 const codeMirrorCSS = css`
@@ -199,42 +194,6 @@ function filterConditionCompletions(
   };
 }
 
-/**
- * Async server-side validation of the filter condition expression
- */
-async function isConditionValid(condition: string, projectId: string) {
-  if (!condition) {
-    return {
-      isValid: true,
-      errorMessage: null,
-    };
-  }
-  const validationResult =
-    await fetchQuery<SpanFilterConditionFieldValidationQuery>(
-      environment,
-      graphql`
-        query SpanFilterConditionFieldValidationQuery(
-          $condition: String!
-          $id: ID!
-        ) {
-          project: node(id: $id) {
-            ... on Project {
-              validateSpanFilterCondition(condition: $condition) {
-                isValid
-                errorMessage
-              }
-            }
-          }
-        }
-      `,
-      { condition, id: projectId }
-    ).toPromise();
-  // Satisfy the type checker
-  if (!validationResult) {
-    throw new Error("Filter condition validation is null");
-  }
-  return validationResult.project.validateSpanFilterCondition;
-}
 
 const extensions = [
   keymap.of([
@@ -263,36 +222,33 @@ export function SpanFilterConditionField(props: SpanFilterConditionFieldProps) {
     placeholder = "filter condition (e.x. span_kind == 'LLM')",
   } = props;
   const [isFocused, setIsFocused] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  const { filterCondition, setFilterCondition, appendFilterCondition } =
-    useSpanFilterCondition();
-  const deferredFilterCondition = useDeferredValue(filterCondition);
+  const { 
+    inputValue, 
+    setInputValue, 
+    filterCondition, 
+    setFilterCondition, 
+    appendFilterCondition,
+    isValidInput,
+    validationError
+  } = useSpanFilterCondition();
   const { theme } = useTheme();
   const codeMirrorTheme = theme === "light" ? githubLight : githubDark;
 
-  const { projectId } = useParams();
-
   const filterConditionFieldRef = useRef<HTMLDivElement>(null);
 
+  // Call onValidCondition when we have a valid applied filter
   useEffect(() => {
-    isConditionValid(deferredFilterCondition, projectId as string).then(
-      (result) => {
-        if (!result?.isValid) {
-          setErrorMessage(result?.errorMessage ?? "Invalid filter condition");
-        } else {
-          setErrorMessage("");
-          if (onValidCondition) {
-            startTransition(() => {
-              onValidCondition(deferredFilterCondition);
-            });
-          }
-        }
-      }
-    );
-  }, [onValidCondition, deferredFilterCondition, projectId]);
+    if (onValidCondition && filterCondition !== inputValue) {
+      // Only call when the applied filter is different from input (meaning it was validated and applied)
+      startTransition(() => {
+        onValidCondition(filterCondition);
+      });
+    }
+  }, [onValidCondition, filterCondition, inputValue]);
 
-  const hasError = errorMessage !== "";
-  const hasCondition = filterCondition !== "";
+  const hasError = !isValidInput;
+  const hasCondition = inputValue !== "";
+  const errorMessage = validationError || "";
   return (
     <div
       data-is-focused={isFocused}
@@ -319,8 +275,8 @@ export function SpanFilterConditionField(props: SpanFilterConditionFieldProps) {
           }}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          value={filterCondition}
-          onChange={setFilterCondition}
+          value={inputValue}
+          onChange={setInputValue}
           height="36px"
           width="100%"
           theme={codeMirrorTheme}
@@ -333,7 +289,7 @@ export function SpanFilterConditionField(props: SpanFilterConditionFieldProps) {
             color: var(--ac-global-text-color-700);
             visibility: ${hasCondition ? "visible" : "hidden"};
           `}
-          onClick={() => setFilterCondition("")}
+          onClick={() => setInputValue("")}
           className="button--reset"
         >
           <Icon svg={<Icons.CloseCircleOutline />} />
